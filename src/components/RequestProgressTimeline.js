@@ -1,0 +1,9 @@
+import { StyleSheet, Text, View } from 'react-native';
+
+import { colors, radius, spacing } from '../constants/theme';
+
+export const LIFECYCLE_STATUSES=[{label:'Accepted',value:'accepted'},{label:'On the Way',value:'on_the_way'},{label:'Arrived',value:'arrived'},{label:'In Progress',value:'in_progress'},{label:'Completed',value:'completed'}];
+
+export default function RequestProgressTimeline({status}){const currentIndex=LIFECYCLE_STATUSES.findIndex((step)=>step.value===status);if(currentIndex<0)return null;return <View accessibilityLabel="Service progress" style={styles.timeline}>{LIFECYCLE_STATUSES.map((step,index)=>{const isReached=index<=currentIndex;const isCurrent=index===currentIndex;return <View key={step.value} style={styles.step}><View style={[styles.marker,isReached&&styles.reachedMarker]}><Text style={[styles.markerText,!isReached&&styles.unreachedMarkerText]}>{isReached?'\u2713':'\u25CB'}</Text></View><Text style={[styles.stepLabel,isReached&&styles.reachedLabel,isCurrent&&styles.currentLabel]}>{step.label}</Text></View>;})}</View>}
+
+const styles=StyleSheet.create({timeline:{backgroundColor:colors.surfaceMuted,borderColor:colors.borderLight,borderRadius:radius.large,borderWidth:1,gap:10,marginTop:spacing.small,padding:spacing.medium},step:{alignItems:'center',flexDirection:'row',gap:10},marker:{alignItems:'center',backgroundColor:colors.surface,borderColor:colors.border,borderRadius:radius.pill,borderWidth:1,height:25,justifyContent:'center',width:25},reachedMarker:{backgroundColor:colors.primary,borderColor:colors.primary},markerText:{color:colors.white,fontSize:13,fontWeight:'800'},unreachedMarkerText:{color:colors.subtleText},stepLabel:{color:colors.mutedText,fontSize:13},reachedLabel:{color:colors.text},currentLabel:{color:colors.primary,fontWeight:'800'}});

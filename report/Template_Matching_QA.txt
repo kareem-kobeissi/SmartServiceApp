@@ -1,0 +1,115 @@
+SMART SERVICE REPORT — TEMPLATE MATCHING QA
+Generated: August 2, 2026
+
+REFERENCE AND DELIVERABLES
+- Visual reference: CENG495_CCE_Final Report_Template_Summer26.pdf
+- Final DOCX: Smart_Service_Report_Chapters_1_to_3_Final.docx
+- Final PDF: Smart_Service_Report_Chapters_1_to_3_Final.pdf
+- SmartServiceApp source code was not modified.
+- Academic content remains limited to the front matter, Chapters 1–3, and References.
+
+PAGE DIMENSIONS AND LAYOUT
+- Doctor template PDF: approximately 595.00 × 841.00 points (A4 portrait).
+- Final report PDF: approximately 595.32 × 841.92 points (A4 portrait as exported by Word).
+- Final margins: 72 points / 1 inch on the left, right, top, and bottom.
+- Measured final main-body text boundaries: x = 72.0 to approximately 526.4 points.
+- Template main-body boundaries: x = 72.0 to approximately 526.4 points.
+- Footer page numbers are centered at y = approximately 756.3 points. The template uses approximately y = 751.3 points; this small difference is caused by Microsoft Word’s footer text metrics.
+
+FONTS, SIZES, AND PARAGRAPHS
+- Extracted academic text uses Times New Roman and Times New Roman Bold only.
+- Main body: Times New Roman, 12 pt, fully justified, double-spaced.
+- First-line body indentation: 0.5 inch / 36 points.
+- Chapter headings: Times New Roman Bold, 16 pt, centered.
+- Section headings: Times New Roman Bold, 14 pt.
+- Subsection headings: Times New Roman Bold, 12 pt.
+- Front-matter headings: Times New Roman Bold, 11 pt, centered.
+- Figure and table captions: Times New Roman Bold, 12 pt, centered.
+- Cover title: Times New Roman Bold, 18 pt.
+- Widow/orphan behavior and keep-with-next rules are applied through Word paragraph styles; captions are kept with their corresponding figures or tables.
+- Manually inserted empty paragraphs after tables were removed to prevent weak pagination.
+
+COVER AND FRONT MATTER
+- The cover has no visible page number: verified.
+- Dedication begins on document page 2 and visibly displays “2”: verified.
+- Approval information is vertical and left-aligned, following the doctor template structure.
+- Student details verified:
+  Mira Youssef, 72030174
+  Hussein Mansour, 42030321
+- Supervisor: Dr. Hussein Abdallah.
+- Campus: Nabatieh, Lebanon.
+- Academic term: Fall 2026–2027.
+- Abstract is one continuous justified 12 pt double-spaced paragraph.
+- Table of Contents is a real Word TOC with heading-level indentation, dot leaders, right-aligned page numbers, and clickable entries.
+- List of Figures and List of Tables use explicit right-aligned dot-leader tab stops and clickable PAGEREF fields.
+- List of Symbols and Abbreviations is an alphabetical plain list, not a table.
+
+FIGURE SEQUENCE
+- Real Word Caption-style paragraphs and 13 SEQ Figure fields are present.
+- Appearance order and final PDF pages:
+  Figure 1-1 — page 13
+  Figure 1-2 — page 14
+  Figure 1-3 — page 15
+  Figure 1-4 — page 16
+  Figure 1-5 — page 17
+  Figure 3-1 — page 25
+  Figure 3-2 — page 26
+  Figure 3-3 — page 27
+  Figure 3-4 — page 28
+  Figure 3-5 — page 29
+  Figure 3-6 — page 30
+  Figure 3-7 — page 31
+  Figure 3-8 — page 33
+- Figure 1-4 is the provider profile/incoming-request figure.
+- Figure 1-5 is the customer-rating/provider-review figure.
+- Every numbered figure is referenced in the report text.
+
+TABLE SEQUENCE
+- Real Word Caption-style paragraphs and 11 SEQ Table fields are present.
+- Appearance order and final PDF pages:
+  Table 2-1 — page 21
+  Table 2-2 — page 21
+  Table 2-3 — page 22
+  Table 3-1 — page 23
+  Table 3-2 — page 24
+  Table 3-3 — page 24
+  Table 3-4 — page 30 (prototype financial assumptions)
+  Table 3-5 — page 31 (principal stakeholders)
+  Table 3-6 — page 32
+  Table 3-7 — page 32
+  Table 3-8 — page 34
+- The financial assumptions table now precedes and is numbered before the stakeholder table.
+- Table headers repeat when a table crosses a page, and rows are prevented from splitting where Word can honor that setting.
+
+PAGINATION AND OUTPUT QA
+- Final PDF page count: 37.
+- No blank or unexplained pages detected.
+- No off-page or clipped text spans detected.
+- Page 18 contains substantive content and is not nearly empty.
+- Chapter 1, Chapter 2, Chapter 3, and References begin on new pages.
+- The prior near-empty Chapter 2 spill page was removed by eliminating manual blank paragraphs and reflowing tables.
+
+LINKS AND BOOKMARKS
+- Total PDF links: 138.
+- Internal links: 118.
+- External reference links: 20.
+- Invalid internal destinations: 0.
+- PDF bookmarks: 40.
+- Required bookmarks verified: Dedication, Acknowledgment, Abstract, Table of Contents, List of Figures, List of Tables, List of Symbols and Abbreviations, Chapter 1, Chapter 2, Chapter 3, and References.
+- In-text [1] style citations link to their Reference entries.
+- In-text Figure and Table references link to their captions.
+
+VISUAL COMPARISON
+- Every one of the 37 final PDF pages was rendered at its native 595 × 842-point page scale for inspection.
+- Side-by-side structural comparison renders were produced for the cover, Dedication, Acknowledgment, Abstract, Contents, List of Figures, List of Tables, List of Symbols, Chapter 1, Chapter 2, Chapter 3, and References.
+- Checked at page scale: text boundaries, heading positions, paragraph density, footer position, caption alignment, table fit, screenshot aspect ratio, and diagram placement.
+- No decorative blue remains in academic text. Genuine application screenshots retain their real interface colors.
+
+UNAVOIDABLE DIFFERENCES
+- The Smart Service title is substantially longer than the template placeholder, so it uses three balanced cover lines while preserving the measured title font and centered placement.
+- Smart Service contains substantially more body text, screenshots, diagrams, tables, and references than the blank doctor template. It therefore has 37 pages rather than the template’s 23 pages, and later pages cannot have one-to-one content correspondence.
+- Microsoft Word exports A4 at approximately 595.32 × 841.92 points, while the supplied template PDF reports approximately 595.00 × 841.00 points.
+- Word’s footer font metrics place the page-number text approximately five points lower than the supplied PDF, while retaining centered bottom placement inside the measured bottom margin.
+
+FINAL RESULT
+- All requested structural, pagination, font, sequence, link, bookmark, and clipping checks pass.

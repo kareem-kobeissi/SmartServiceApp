@@ -1,24 +1,65 @@
-{
-  "expo": {
-    "name": "SmartServiceApp",
-    "slug": "SmartServiceApp",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
-  }
+﻿{
+    "expo":  {
+                 "name":  "SmartServiceApp",
+                 "slug":  "SmartServiceApp",
+                 "version":  "1.0.0",
+                 "orientation":  "portrait",
+                 "icon":  "./assets/icon.png",
+                 "userInterfaceStyle":  "light",
+                 "ios":  {
+                             "supportsTablet":  true
+                         },
+                 "android":  {
+                                 "googleServicesFile":  "./google-services.json",
+                                 "adaptiveIcon":  {
+                                                      "backgroundColor":  "#E6F4FE",
+                                                      "foregroundImage":  "./assets/android-icon-foreground.png",
+                                                      "backgroundImage":  "./assets/android-icon-background.png",
+                                                      "monochromeImage":  "./assets/android-icon-monochrome.png"
+                                                  },
+                                 "permissions":  [
+                                                     "android.permission.ACCESS_COARSE_LOCATION",
+                                                     "android.permission.ACCESS_FINE_LOCATION",
+                                                     "android.permission.POST_NOTIFICATIONS"
+                                                 ],
+                                 "package":  "com.kareem99karen.smartserviceapp",
+                                 "config":  {
+
+                                            }
+                             },
+                 "web":  {
+                             "favicon":  "./assets/favicon.png"
+                         },
+                 "plugins":  [
+                                 "expo-secure-store",
+                                 [
+                                     "expo-image-picker",
+                                     {
+                                         "photosPermission":  "Allow Smart Service to select a problem image for a service request.",
+                                         "cameraPermission":  false,
+                                         "microphonePermission":  false
+                                     }
+                                 ],
+                                 [
+                                     "expo-location",
+                                     {
+                                         "locationWhenInUsePermission":  "Allow Smart Service to use your location for service requests and optional live provider sharing.",
+                                         "isIosBackgroundLocationEnabled":  false,
+                                         "isAndroidBackgroundLocationEnabled":  false
+                                     }
+                                 ],
+                                 [
+                                     "expo-notifications",
+                                     {
+                                         "color":  "#175CD3",
+                                         "defaultChannel":  "service-updates"
+                                     }
+                                 ]
+                             ],
+                 "extra":  {
+                               "eas":  {
+                                           "projectId":  "c5a109e6-21cc-4c98-b8df-7ca07d73df7c"
+                                       }
+                           }
+             }
 }

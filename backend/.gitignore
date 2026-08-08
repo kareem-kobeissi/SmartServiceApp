@@ -1,0 +1,6 @@
+node_modules/
+.env
+uploads/*
+!uploads/service-requests/
+uploads/service-requests/*
+!uploads/service-requests/.gitkeep
