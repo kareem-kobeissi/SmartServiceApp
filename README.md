@@ -1,6 +1,6 @@
 ﻿# Smart Service
 
-Smart Service is a graduation-project mobile application that connects customers with nearby service providers. It uses React Native with Expo and JavaScript, with a Node.js/Express backend and MongoDB Atlas.
+Smart Service is a  mobile application that connects customers with nearby service providers. It uses React Native with Expo and JavaScript, with a Node.js/Express backend and MongoDB Atlas.
 
 ## Main capabilities
 
