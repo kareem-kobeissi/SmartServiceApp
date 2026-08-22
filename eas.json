@@ -9,7 +9,12 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "environment": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://smart-service-api-7fkb.onrender.com",
+        "EXPO_PUBLIC_SOCKET_URL": "https://smart-service-api-7fkb.onrender.com"
+      }
     },
     "production": {
       "autoIncrement": true

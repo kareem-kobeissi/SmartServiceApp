@@ -1,0 +1,27 @@
+# Dependencies and generated Expo output
+node_modules/
+backend/node_modules/
+.expo/
+dist/
+web-build/
+
+# Local and generated native projects
+android/
+ios/
+.kotlin/
+
+# Private environment files are supplied through EAS Environment Variables
+.env
+.env.*
+
+# Development/report artifacts
+.report-work/
+report/
+
+# Repository metadata and editor/system files
+.git/
+.DS_Store
+*.log
+
+# Firebase is ignored by Git but included in the private EAS build archive.
+!google-services.json
