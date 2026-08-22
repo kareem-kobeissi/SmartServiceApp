@@ -11,6 +11,9 @@
   "author": "",
   "license": "ISC",
   "description": "Backend API for Smart Service",
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
