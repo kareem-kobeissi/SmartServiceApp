@@ -164,14 +164,69 @@ export async function getAvailableProviders(requestId) {
 }
 
 export async function selectRequestProvider(requestId, providerId) {
-  return apiRequest(
-    `/api/requests/${encodeURIComponent(requestId)}/select-provider`,
-    {
-      method: 'PATCH',
-      headers: await getStoredAuthorizationHeader(),
-      body: JSON.stringify({ providerId }),
-    },
-  );
+  const selectProvider = async () =>
+    apiRequest(
+      `/api/requests/${encodeURIComponent(requestId)}/select-provider`,
+      {
+        method: 'PATCH',
+        headers: await getStoredAuthorizationHeader(),
+        body: JSON.stringify({ providerId }),
+      },
+    );
+
+  const findSavedSelection = async () => {
+    const result = await getMyServiceRequests();
+    const savedRequest = result.requests?.find(
+      (serviceRequest) => serviceRequest.id === requestId,
+    );
+    const savedProviderId =
+      typeof savedRequest?.provider === 'object'
+        ? savedRequest.provider?.id
+        : savedRequest?.provider;
+
+    if (
+      savedRequest?.status === 'offered' &&
+      savedProviderId === providerId
+    ) {
+      return {
+        success: true,
+        message: 'Provider selected successfully.',
+        request: savedRequest,
+      };
+    }
+
+    return null;
+  };
+
+  try {
+    return await selectProvider();
+  } catch (error) {
+    if (error.status) throw error;
+
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+
+    try {
+      const savedSelection = await findSavedSelection();
+      if (savedSelection) return savedSelection;
+    } catch {
+      // A short retry below handles a transient Render or mobile connection.
+    }
+
+    try {
+      return await selectProvider();
+    } catch (retryError) {
+      if (retryError.status === 409) {
+        try {
+          const savedSelection = await findSavedSelection();
+          if (savedSelection) return savedSelection;
+        } catch {
+          // Preserve the final API error when state reconciliation also fails.
+        }
+      }
+
+      throw retryError;
+    }
+  }
 }
 
 export async function getProviderRequests() {
