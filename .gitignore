@@ -44,3 +44,11 @@ yarn-error.*
 .env
 google-services.json
 .report-work/
+
+# local verification exports
+.apk-check/
+.expo-apk-check/
+.expo-image-upload-check/
+
+# Microsoft Office temporary lock files
+~$*.docx
