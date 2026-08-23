@@ -1,3 +1,6 @@
+import * as FileSystem from 'expo-file-system/legacy';
+import { Platform } from 'react-native';
+
 import { API_BASE_URL } from '../constants/config';
 import { getAuthToken } from './tokenStorage';
 
@@ -114,6 +117,54 @@ export async function updateProviderLocation(coordinates) {
 
 export async function createServiceRequest(requestData, imageAsset = null) {
   if (imageAsset) {
+    if (Platform.OS !== 'web') {
+      let uploadResult;
+
+      try {
+        uploadResult = await FileSystem.uploadAsync(
+          `${API_BASE_URL}/api/requests`,
+          imageAsset.uri,
+          {
+            fieldName: 'image',
+            headers: await getStoredAuthorizationHeader(),
+            httpMethod: 'POST',
+            mimeType: imageAsset.mimeType || 'image/jpeg',
+            parameters: Object.fromEntries(
+              Object.entries(requestData).map(([key, value]) => [
+                key,
+                String(value),
+              ]),
+            ),
+            uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+          },
+        );
+      } catch {
+        throw new ApiError(
+          'Unable to upload the selected image. Check the connection and try again.',
+        );
+      }
+
+      let data;
+
+      try {
+        data = JSON.parse(uploadResult.body);
+      } catch {
+        throw new ApiError(
+          'The server returned an invalid response.',
+          uploadResult.status,
+        );
+      }
+
+      if (uploadResult.status < 200 || uploadResult.status >= 300) {
+        throw new ApiError(
+          data?.message || 'Unable to create the service request.',
+          uploadResult.status,
+        );
+      }
+
+      return data;
+    }
+
     const formData = new FormData();
     Object.entries(requestData).forEach(([key, value]) => {
       formData.append(key, String(value));
