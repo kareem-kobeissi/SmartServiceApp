@@ -1,6 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -21,6 +23,7 @@ import { colors, radius, shadows, spacing } from '../constants/theme';
 import useFocusPolling from '../hooks/useFocusPolling';
 import useRequestRooms from '../hooks/useRequestRooms';
 import {
+  cancelCustomerRequest,
   getMyServiceRequests,
   hideCustomerRequest,
 } from '../services/api';
@@ -59,6 +62,8 @@ function formatStatus(status) {
 }
 
 export default function MyRequestsScreen({ navigation, route }) {
+  const [cancellingRequestId, setCancellingRequestId] = useState(null);
+  const [cancellationMessage, setCancellationMessage] = useState('');
   const fetchRequests = useCallback(async () => {
     const result = await getMyServiceRequests();
     return result.requests;
@@ -72,6 +77,50 @@ export default function MyRequestsScreen({ navigation, route }) {
   } = useFocusPolling(fetchRequests, []);
   useRequestRooms(requests.map((request) => request.id));
 
+  const confirmCancellation = useCallback(async (requestId) => {
+    setCancellationMessage('');
+    setCancellingRequestId(requestId);
+
+    try {
+      const result = await cancelCustomerRequest(requestId);
+      setRequests((currentRequests) =>
+        currentRequests.map((item) =>
+          item.id === requestId ? result.request : item,
+        ),
+      );
+      setCancellationMessage(
+        'Request cancelled. A $10 cancellation fee applies.',
+      );
+    } catch (error) {
+      setCancellationMessage(
+        error.message || 'Unable to cancel this request.',
+      );
+    } finally {
+      setCancellingRequestId(null);
+    }
+  }, [setRequests]);
+
+  const handleCancellation = useCallback((requestId) => {
+    const message =
+      'Cancel this service request? A $10 cancellation fee applies.';
+
+    if (Platform.OS === 'web') {
+      if (globalThis.confirm(message)) {
+        confirmCancellation(requestId);
+      }
+      return;
+    }
+
+    Alert.alert('Cancel service request', message, [
+      { text: 'Keep Request', style: 'cancel' },
+      {
+        text: 'Cancel Request',
+        style: 'destructive',
+        onPress: () => confirmCancellation(requestId),
+      },
+    ]);
+  }, [confirmCancellation]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
@@ -84,6 +133,11 @@ export default function MyRequestsScreen({ navigation, route }) {
         {connectionMessage ? (
           <Text accessibilityRole="alert" style={styles.connectionMessage}>
             {connectionMessage}
+          </Text>
+        ) : null}
+        {cancellationMessage ? (
+          <Text accessibilityRole="alert" style={styles.cancellationMessage}>
+            {cancellationMessage}
           </Text>
         ) : null}
 
@@ -195,6 +249,30 @@ export default function MyRequestsScreen({ navigation, route }) {
                     }
                   />
                 ) : null}
+                {[
+                  'pending',
+                  'offered',
+                  'accepted',
+                  'on_the_way',
+                  'arrived',
+                  'in_progress',
+                ].includes(request.status) ? (
+                  <View style={styles.cancellationSection}>
+                    <AppButton
+                      disabled={Boolean(cancellingRequestId)}
+                      label={
+                        cancellingRequestId === request.id
+                          ? 'Cancelling...'
+                          : 'Cancel Order'
+                      }
+                      onPress={() => handleCancellation(request.id)}
+                      variant="secondary"
+                    />
+                    <Text style={styles.cancellationFeeNotice}>
+                      You have to pay a $10 fee if you want to cancel.
+                    </Text>
+                  </View>
+                ) : null}
                 {CLEANUP_STATUSES.includes(request.status) ? (
                   <RequestCleanupButton
                     onRemoved={(requestId) =>
@@ -225,4 +303,4 @@ export default function MyRequestsScreen({ navigation, route }) {
   );
 }
 
-const styles=StyleSheet.create({safeArea:{backgroundColor:colors.background,flex:1},container:{alignSelf:'center',flexGrow:1,gap:spacing.large,maxWidth:820,padding:spacing.large,width:'100%'},title:{color:colors.text,fontSize:30,fontWeight:'800',letterSpacing:-0.7},successMessage:{backgroundColor:colors.successSoft,borderRadius:radius.medium,color:colors.success,fontSize:14,fontWeight:'700',padding:12,textAlign:'center'},loadingContainer:{alignItems:'center',backgroundColor:colors.surface,borderRadius:radius.large,gap:spacing.medium,paddingVertical:spacing.extraLarge},helperText:{color:colors.mutedText,fontSize:13,lineHeight:20,textAlign:'center'},emptyCard:{alignItems:'center',backgroundColor:colors.surface,borderColor:colors.borderLight,borderRadius:radius.large,borderWidth:1,gap:spacing.small,padding:spacing.extraLarge,...shadows.small},emptyTitle:{color:colors.text,fontSize:18,fontWeight:'800'},requests:{gap:spacing.medium},requestCard:{backgroundColor:colors.surface,borderColor:colors.borderLight,borderRadius:radius.large,borderWidth:1,gap:12,padding:spacing.large,...shadows.small},cardHeader:{alignItems:'flex-start',flexDirection:'row',gap:spacing.small,justifyContent:'space-between'},serviceType:{color:colors.text,flex:1,fontSize:18,fontWeight:'800'},status:{backgroundColor:colors.primarySoft,borderRadius:radius.pill,color:colors.primary,fontSize:11,fontWeight:'800',maxWidth:'52%',overflow:'hidden',paddingHorizontal:10,paddingVertical:6,textAlign:'right',textTransform:'uppercase'},description:{color:colors.text,fontSize:15,lineHeight:22},date:{color:colors.subtleText,fontSize:12},locationIndicator:{color:colors.success,fontSize:13,fontWeight:'700'},providerName:{color:colors.text,fontSize:14,fontWeight:'700'},rejectedProviderName:{color:colors.warning,fontSize:14,fontWeight:'700'},connectionMessage:{color:colors.warning,fontSize:13,textAlign:'center'},completionMessage:{backgroundColor:colors.successSoft,borderRadius:radius.medium,color:colors.success,fontSize:14,fontWeight:'700',padding:10},errorMessage:{backgroundColor:colors.errorSoft,borderRadius:radius.medium,color:colors.error,fontSize:14,padding:12,textAlign:'center'}});
+const styles=StyleSheet.create({safeArea:{backgroundColor:colors.background,flex:1},container:{alignSelf:'center',flexGrow:1,gap:spacing.large,maxWidth:820,padding:spacing.large,width:'100%'},title:{color:colors.text,fontSize:30,fontWeight:'800',letterSpacing:-0.7},successMessage:{backgroundColor:colors.successSoft,borderRadius:radius.medium,color:colors.success,fontSize:14,fontWeight:'700',padding:12,textAlign:'center'},loadingContainer:{alignItems:'center',backgroundColor:colors.surface,borderRadius:radius.large,gap:spacing.medium,paddingVertical:spacing.extraLarge},helperText:{color:colors.mutedText,fontSize:13,lineHeight:20,textAlign:'center'},emptyCard:{alignItems:'center',backgroundColor:colors.surface,borderColor:colors.borderLight,borderRadius:radius.large,borderWidth:1,gap:spacing.small,padding:spacing.extraLarge,...shadows.small},emptyTitle:{color:colors.text,fontSize:18,fontWeight:'800'},requests:{gap:spacing.medium},requestCard:{backgroundColor:colors.surface,borderColor:colors.borderLight,borderRadius:radius.large,borderWidth:1,gap:12,padding:spacing.large,...shadows.small},cardHeader:{alignItems:'flex-start',flexDirection:'row',gap:spacing.small,justifyContent:'space-between'},serviceType:{color:colors.text,flex:1,fontSize:18,fontWeight:'800'},status:{backgroundColor:colors.primarySoft,borderRadius:radius.pill,color:colors.primary,fontSize:11,fontWeight:'800',maxWidth:'52%',overflow:'hidden',paddingHorizontal:10,paddingVertical:6,textAlign:'right',textTransform:'uppercase'},description:{color:colors.text,fontSize:15,lineHeight:22},date:{color:colors.subtleText,fontSize:12},locationIndicator:{color:colors.success,fontSize:13,fontWeight:'700'},providerName:{color:colors.text,fontSize:14,fontWeight:'700'},rejectedProviderName:{color:colors.warning,fontSize:14,fontWeight:'700'},connectionMessage:{color:colors.warning,fontSize:13,textAlign:'center'},completionMessage:{backgroundColor:colors.successSoft,borderRadius:radius.medium,color:colors.success,fontSize:14,fontWeight:'700',padding:10},cancellationSection:{gap:spacing.small},cancellationFeeNotice:{color:colors.error,fontSize:12,fontWeight:'700',lineHeight:18,textAlign:'center'},cancellationMessage:{backgroundColor:colors.warningSoft,borderRadius:radius.medium,color:colors.warning,fontSize:14,fontWeight:'700',padding:12,textAlign:'center'},errorMessage:{backgroundColor:colors.errorSoft,borderRadius:radius.medium,color:colors.error,fontSize:14,padding:12,textAlign:'center'}});

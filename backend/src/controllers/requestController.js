@@ -14,9 +14,39 @@ const {
 const {
   estimateServiceRequest,
 } = require('../services/serviceEstimationService');
+const {
+  hasActiveProviderRequest,
+} = require('../services/providerAvailabilityService');
 
 const DEFAULT_PROVIDER_SEARCH_RADIUS_KM = 50;
 const AVERAGE_TRAVEL_SPEED_KM_PER_HOUR = 30;
+const CUSTOMER_CANCELLABLE_STATUSES = [
+  'pending',
+  'offered',
+  'accepted',
+  'on_the_way',
+  'arrived',
+  'in_progress',
+];
+const CANCELLATION_FEE_USD = 10;
+
+function isCustomerCancellationAllowed(status) {
+  return CUSTOMER_CANCELLABLE_STATUSES.includes(status);
+}
+
+function compareAvailableProviders(firstProvider, secondProvider) {
+  const distanceDifference =
+    firstProvider.distanceMeters - secondProvider.distanceMeters;
+
+  if (distanceDifference !== 0) {
+    return distanceDifference;
+  }
+
+  return (
+    (secondProvider.averageRating || 0) -
+    (firstProvider.averageRating || 0)
+  );
+}
 
 function formatServiceRequest(serviceRequest) {
   const selectedProvider = serviceRequest.provider?.fullName
@@ -272,6 +302,7 @@ async function getAvailableProviders(request, response) {
         },
       },
     ]);
+    providers.sort(compareAvailableProviders);
 
     if (process.env.NODE_ENV !== 'production') {
       console.log('Provider discovery', {
@@ -309,6 +340,118 @@ async function getAvailableProviders(request, response) {
       success: false,
       message: 'Unable to find available providers.',
     });
+  }
+}
+
+async function cancelServiceRequest(request, response) {
+  if (!mongoose.isValidObjectId(request.params.requestId)) {
+    return response.status(404).json({
+      success: false,
+      message: 'Service request not found.',
+    });
+  }
+
+  const session = await mongoose.startSession();
+  let cancelledRequest;
+
+  try {
+    await session.withTransaction(async () => {
+      const serviceRequest = await ServiceRequest.findOne({
+        _id: request.params.requestId,
+        customer: request.user.id,
+      }).session(session);
+
+      if (!serviceRequest) {
+        const error = new Error('Service request not found.');
+        error.status = 404;
+        throw error;
+      }
+
+      if (!isCustomerCancellationAllowed(serviceRequest.status)) {
+        const error = new Error(
+          'Only a non-terminal service request can be cancelled.',
+        );
+        error.status = 409;
+        throw error;
+      }
+
+      const cancelledAt = new Date();
+      cancelledRequest = await ServiceRequest.findOneAndUpdate(
+        {
+          _id: serviceRequest._id,
+          customer: request.user.id,
+          status: serviceRequest.status,
+        },
+        {
+          $set: {
+            status: 'cancelled',
+            locationSharingActive: false,
+            locationSharingStoppedAt: cancelledAt,
+            lastProviderLocation: null,
+            lastProviderLocationUpdatedAt: null,
+          },
+        },
+        { new: true, session },
+      );
+
+      if (!cancelledRequest) {
+        const error = new Error(
+          'The request changed before cancellation was completed.',
+        );
+        error.status = 409;
+        throw error;
+      }
+
+      if (
+        serviceRequest.provider &&
+        ['accepted', 'on_the_way', 'arrived', 'in_progress'].includes(
+          serviceRequest.status,
+        )
+      ) {
+        const hasOtherActiveRequest = await hasActiveProviderRequest(
+          serviceRequest.provider,
+          { excludeRequestId: serviceRequest._id, session },
+        );
+
+        await User.updateOne(
+          {
+            _id: serviceRequest.provider,
+            role: 'provider',
+            'serviceTypes.0': { $exists: true },
+            providerLocation: { $ne: null },
+          },
+          {
+            $set: {
+              availabilityStatus: hasOtherActiveRequest ? 'busy' : 'available',
+            },
+          },
+          { session },
+        );
+      }
+    });
+
+    await cancelledRequest.populate('provider', 'fullName');
+
+    return response.status(200).json({
+      success: true,
+      message: 'Service request cancelled successfully.',
+      cancellationFee: CANCELLATION_FEE_USD,
+      request: formatServiceRequest(cancelledRequest),
+    });
+  } catch (error) {
+    if (error.status) {
+      return response.status(error.status).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    return response.status(500).json({
+      success: false,
+      message: 'Unable to cancel the service request.',
+    });
+  } finally {
+    await session.endSession();
   }
 }
 
@@ -446,8 +589,11 @@ async function selectProvider(request, response) {
 }
 
 module.exports = {
+  cancelServiceRequest,
+  compareAvailableProviders,
   createServiceRequest,
   getAvailableProviders,
   getMyServiceRequests,
+  isCustomerCancellationAllowed,
   selectProvider,
 };

@@ -20,6 +20,7 @@ function requestMutationEvent(request, responseBody) {
     return request.body.action === 'accept' ? 'request:accepted' : 'request:rejected';
   }
   if (method === 'PATCH' && path.endsWith('/status')) return 'request:statusChanged';
+  if (method === 'PATCH' && path.endsWith('/cancel')) return 'request:statusChanged';
   if (method === 'POST' && path.endsWith('/rating')) return 'request:rated';
   if (method === 'PATCH' && path.endsWith('/hide')) return 'request:hidden';
 
@@ -89,9 +90,11 @@ async function publishSuccessfulMutation(request, responseBody) {
       });
     }
 
-    if (['request:accepted', 'request:completed'].includes(
+    if (['request:accepted', 'request:completed', 'request:cancelled'].includes(
       eventName === 'request:statusChanged' && serviceRequest.status === 'completed'
         ? 'request:completed'
+        : eventName === 'request:statusChanged' && serviceRequest.status === 'cancelled'
+          ? 'request:cancelled'
         : eventName,
     ) && providerId) {
       const provider = await User.findById(providerId).select('availabilityStatus');

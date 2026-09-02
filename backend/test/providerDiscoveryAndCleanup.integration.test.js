@@ -49,6 +49,7 @@ async function createUser(values) {
     serviceTypes: values.serviceTypes || [],
     availabilityStatus: values.availabilityStatus || 'offline',
     providerLocation: values.providerLocation || null,
+    averageRating: values.averageRating || 0,
   });
   createdUserIds.push(user._id);
   return user;
@@ -93,6 +94,7 @@ before(async () => {
     serviceTypes: ['plumber'],
     availabilityStatus: 'available',
     providerLocation: nearLocation,
+    averageRating: 3.8,
   });
   otherProvider = await createUser({
     fullName: 'Other Assigned Provider',
@@ -101,6 +103,7 @@ before(async () => {
     serviceTypes: ['plumber'],
     availabilityStatus: 'available',
     providerLocation: nearLocation,
+    averageRating: 4.9,
   });
   await createUser({
     fullName: 'Offline Matching Provider',
@@ -169,6 +172,11 @@ test('nearby discovery returns only available matching providers in range', asyn
   assert.ok(!names.includes('Busy Matching Provider'));
   assert.ok(!names.includes('Different Service Provider'));
   assert.ok(!names.includes('Outside Radius Provider'));
+  assert.ok(
+    names.indexOf('Other Assigned Provider') <
+      names.indexOf('Matching Available Provider'),
+    'Higher rating should win when provider distances are equal.',
+  );
 });
 
 test('another customer cannot hide a customer request', async () => {

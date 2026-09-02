@@ -204,6 +204,14 @@ export async function getMyServiceRequests() {
   });
 }
 
+export async function cancelCustomerRequest(requestId) {
+  return apiRequest(`/api/requests/${encodeURIComponent(requestId)}/cancel`, {
+    method: 'PATCH',
+    headers: await getStoredAuthorizationHeader(),
+    body: JSON.stringify({}),
+  });
+}
+
 export async function getAvailableProviders(requestId) {
   return apiRequest(
     `/api/requests/${encodeURIComponent(requestId)}/available-providers`,

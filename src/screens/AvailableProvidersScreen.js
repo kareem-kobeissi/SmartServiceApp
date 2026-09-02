@@ -99,6 +99,10 @@ export default function AvailableProvidersScreen({ navigation, route }) {
         <Text style={styles.subtitle}>
           Nearby providers for {matchingService}
         </Text>
+        <Text style={styles.rankingNotice}>
+          Providers are ordered by nearest distance first. When distance is
+          equal, the provider with the higher rating appears first.
+        </Text>
 
         {etaNotice ? (
           <Text style={styles.etaNotice}>{etaNotice}</Text>
@@ -212,6 +216,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     padding: spacing.medium,
+  },
+  rankingNotice: {
+    color: colors.mutedText,
+    fontSize: 13,
+    lineHeight: 19,
   },
   loadingContainer: {
     alignItems: 'center',

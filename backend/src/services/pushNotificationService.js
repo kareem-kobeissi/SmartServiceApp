@@ -72,6 +72,9 @@ function buildRequestNotification(eventName, serviceRequest) {
   if (eventName === 'request:rejected') {
     return { userId: serviceRequest.customer, title: 'Request Rejected', body: 'Your service request was rejected.', data };
   }
+  if (eventName === 'request:statusChanged' && serviceRequest.status === 'cancelled' && serviceRequest.provider) {
+    return { userId: serviceRequest.provider, title: 'Request Cancelled', body: 'The customer cancelled the service request.', data: { ...data, status: serviceRequest.status } };
+  }
   if (eventName === 'request:statusChanged' && STATUS_MESSAGES[serviceRequest.status]) {
     return { userId: serviceRequest.customer, title: 'Service Status Updated', body: STATUS_MESSAGES[serviceRequest.status], data: { ...data, status: serviceRequest.status } };
   }
